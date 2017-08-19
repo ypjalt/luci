@@ -1,0 +1,18 @@
+
+config service 'pptpd'
+	option localip '10.0.0.1'
+	option remoteip '10.0.0.2-254'
+	option nat '1'
+	list dns '10.0.0.1'
+	list dns '223.5.5.5'
+	option ssproxy '1'
+	option mppe '1'
+	option internet '0'
+	option enabled '0'
+
+config login
+	option enabled '1'
+	option ipaddress '*'
+	option username 'user'
+	option password 'password'
+

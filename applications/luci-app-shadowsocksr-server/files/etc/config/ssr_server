@@ -1,0 +1,12 @@
+
+config global
+	option enable '0'
+
+config server
+	option encrypt_method 'rc4-md5'
+	option protocol 'auth_aes128_sha1'
+	option obfs 'http_simple'
+	option password 'password'
+	option timeout '300'
+	option fast_open 'true'
+	option server_port '137'

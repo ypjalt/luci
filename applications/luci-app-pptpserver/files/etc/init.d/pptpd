@@ -1,0 +1,106 @@
+#!/bin/sh /etc/rc.common
+# Copyright (C) 2006 OpenWrt.org
+
+START=60
+BIN=/usr/sbin/pptpd
+DEFAULT=/etc/default/$BIN
+RUN_D=/var/run
+PID_F=$RUN_D/$BIN.pid
+CONFIG=/var/etc/pptpd.conf
+CHAP_SECRETS=/var/etc/chap-secrets
+setup_dns() {
+	[ -n "$1" ] || return 0
+	echo ms-dns $1>>/etc/ppp/options.pptpd
+}
+setup_login() {
+	local section="$1"
+
+	## Code by VPN Server ##
+	config_get enabled "$section" enabled
+	[ "$enabled" -eq 0 ] && return 0
+
+	config_get ipaddress "$section" ipaddress
+	[ -n "$ipaddress" ] || local ipaddress = "*"
+	## Code by VPN Server ##
+
+	config_get username "$section" username
+	config_get password "$section" password
+	[ -n "$username" ] || return 0
+	[ -n "$password" ] || return 0
+
+	echo "$username * $password $ipaddress" >> $CHAP_SECRETS
+	## echo "$username pptp-server $password *" >> $CHAP_SECRETS
+}
+
+setup_config() {
+	local section="$1"
+
+	config_get enabled "$section" enabled
+	[ "$enabled" -eq 0 ] && return 1
+
+	mkdir -p /var/etc
+	cp /etc/pptpd.conf $CONFIG
+
+	
+	config_get localip "$section" localip
+	config_get remoteip "$section" remoteip
+	options="cat /etc/pptpd.conf |grep options"
+	[ -n "$localip" ] && echo "localip  $localip" >> $CONFIG
+	[ -n "$remoteip" ] && echo "remoteip  $remoteip" >> $CONFIG
+	[ -n "$options" ] && echo "option /etc/ppp/options.pptpd" >> $CONFIG
+
+	## Code by VPN Server ##
+  config_get nat "$section" nat
+  config_get internet "$section" internet
+  config_get ssproxy "$section" ssproxy
+  if [ "$nat" -eq 1 ]; then
+       iptables -I forwarding_rule -s ${localip%.*}.0/24 -j ACCEPT
+       iptables -t nat -A POSTROUTING -s ${localip%.*}.0/24 -j MASQUERADE
+  fi
+  if [ "$internet" -eq 1 ]; then
+      iptables -I zone_wan_input 2 -p tcp --dport 1723 -j ACCEPT 
+      iptables -I zone_wan_forward -p gre -j zone_lan_dest_ACCEPT
+  fi	
+  if [ "$ssproxy" -eq 1 ]; then
+      iptables -t nat -A prerouting_rule -i pppoe-wan -p tcp -j RETURN
+      iptables -t nat -A prerouting_rule -i ppp+ -p tcp -j SHADOWSOCKS
+  fi	
+  config_get mppe "$section" mppe
+	sed -i -e 's/#*mppe/mppe/g' /etc/ppp/options.pptpd
+	if [ "$mppe" -eq 0 ]; then
+		sed -i -e 's/mppe/#mppe/g' /etc/ppp/options.pptpd
+	fi
+	sed -i -e '/ms-dns/d' /etc/ppp/options.pptpd
+	config_list_foreach "pptpd" "dns" setup_dns
+	## Code by VPN Server ##
+
+	return 0
+}
+
+start_pptpd() {
+	[ -f $DEFAULT ] && . $DEFAULT
+	mkdir -p $RUN_D
+	for m in arc4 sha1_generic slhc crc-ccitt ppp_generic ppp_async ppp_mppe; do
+		insmod $m >/dev/null 2>&1
+	done
+	ln -sfn $CHAP_SECRETS /etc/ppp/chap-secrets
+	service_start $BIN $OPTIONS -c $CONFIG
+}
+
+start() {
+	config_load pptpd
+	setup_config pptpd || return
+	rm -f $CHAP_SECRETS
+	config_foreach setup_login login
+	start_pptpd
+}
+
+stop() {
+	localip=$(uci get pptpd.pptpd.localip)
+	service_stop $BIN
+	iptables -D forwarding_rule -s ${localip%.*}.0/24 -j ACCEPT 2>/dev/null
+	iptables -t nat -D POSTROUTING -s ${localip%.*}.0/24 -j MASQUERADE 2>/dev/null
+	iptables -D zone_wan_input -p tcp -m tcp --dport 1723 -j ACCEPT  2>/dev/null
+	iptables -D zone_wan_forward -p gre -j zone_lan_dest_ACCEPT 2>/dev/null
+  iptables -t nat -F prerouting_rule
+}

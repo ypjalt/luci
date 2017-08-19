@@ -1,0 +1,9 @@
+
+config global
+	option time_update '4'
+	option https '0'
+	option filter_mode 'adblock'
+	option adblock '0'
+	option enabled '0'
+
+
