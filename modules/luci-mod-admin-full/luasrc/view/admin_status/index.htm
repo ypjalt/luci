@@ -16,6 +16,9 @@
 
 	local sysinfo = luci.util.ubus("system", "info") or { }
 	local boardinfo = luci.util.ubus("system", "board") or { }
+	local cpuinfo = luci.sys.exec("cat /proc/cpuinfo") or { }
+	local processor = cpuinfo:match("platform\t+: ([^\n]+)") or { }
+	local march = cpuinfo:match("cpu\t+: ([^\n]+)") or { }
 	local unameinfo = nixio.uname() or { }
 
 	local meminfo = sysinfo.memory or {
@@ -37,8 +40,10 @@
 		local wan = ntm:get_wannet()
 		local wan6 = ntm:get_wan6net()
 
-		local conn_count = tonumber(
-			fs.readfile("/proc/sys/net/netfilter/nf_conntrack_count")) or 0
+		local conn_count = tonumber((
+			luci.sys.exec("wc -l /proc/net/nf_conntrack") or
+			luci.sys.exec("wc -l /proc/net/ip_conntrack") or
+			""):match("%d+")) or 0
 
 		local conn_max = tonumber((
 			luci.sys.exec("sysctl net.nf_conntrack_max") or
@@ -47,12 +52,14 @@
 
 		local rv = {
 			uptime     = sysinfo.uptime or 0,
-			localtime  = os.date(),
+			localtime  = os.date("%F %T"),
 			loadavg    = sysinfo.load or { 0, 0, 0 },
+			cpuusage   = luci.sys.exec("echo $( echo $(cat /proc/stat | grep \"^cpu \" | awk '{print $1+$2+$3+$4+$5+$6+$7 \" \" $1+$2+$3+$6+$7}') $(sleep 1 && cat /proc/stat | grep \"^cpu \" | awk '{print $1+$2+$3+$4+$5+$6+$7 \" \" $1+$2+$3+$6+$7}') | awk '{print (($4-$2)/($3-$1))*100}' )"),
 			memory     = meminfo,
 			swap       = swapinfo,
 			connmax    = conn_max,
 			conncount  = conn_count,
+		    temperature= luci.sys.exec("cat /sys/class/thermal/thermal_zone0/temp"),
 			leases     = stat.dhcp_leases(),
 			leases6    = stat.dhcp6_leases(),
 			wifinets   = stat.wifi_networks()
@@ -107,7 +114,7 @@
 
 <%+header%>
 
-<script type="text/javascript" src="<%=resource%>/cbi.js"></script>
+<script type="text/javascript" src="<%=resource%>/cbi.js?v=git-17.194.28316-2224714"></script>
 <script type="text/javascript">//<![CDATA[
 	function progressbar(v, m)
 	{
@@ -637,34 +644,39 @@
 					info.loadavg[2] / 65535.0
 				);
 
-			if (e = document.getElementById('memtotal'))
+			if (e = document.getElementById('cpuusage'))
+                                e.innerHTML = String.format('%.02f\%',info.cpuusage);
+
+			if (e = document.getElementById('temperature'))
+                                e.innerHTML = String.format('%d\℃' ,info.temperature / 1000);
+		if (e = document.getElementById('memtotal'))
 				e.innerHTML = progressbar(
-					((info.memory.free + info.memory.buffered) / 1024) + " <%:kB%>",
-					(info.memory.total / 1024) + " <%:kB%>"
+					Math.floor((info.memory.free + info.memory.buffered) / 1048576) + " <%:MB%>",
+					Math.floor(info.memory.total / 1048576) + " <%:MB%>"
 				);
 
 			if (e = document.getElementById('memfree'))
 				e.innerHTML = progressbar(
-					(info.memory.free / 1024) + " <%:kB%>",
-					(info.memory.total / 1024) + " <%:kB%>"
+					Math.floor(info.memory.free / 1048576) + " <%:MB%>",
+					Math.floor(info.memory.total / 1048576) + " <%:MB%>"
 				);
 
 			if (e = document.getElementById('membuff'))
 				e.innerHTML = progressbar(
-					(info.memory.buffered / 1024) + " <%:kB%>",
-					(info.memory.total / 1024) + " <%:kB%>"
+					Math.floor(info.memory.buffered / 1048576) + " <%:MB%>",
+					Math.floor(info.memory.total / 1048576) + " <%:MB%>"
 				);
 
 			if (e = document.getElementById('swaptotal'))
 				e.innerHTML = progressbar(
-					(info.swap.free / 1024) + " <%:kB%>",
-					(info.swap.total / 1024) + " <%:kB%>"
+					Math.floor(info.swap.free / 1048576) + " <%:MB%>",
+					Math.floor(info.swap.total / 1048576) + " <%:MB%>"
 				);
 
 			if (e = document.getElementById('swapfree'))
 				e.innerHTML = progressbar(
-					(info.swap.free / 1024) + " <%:kB%>",
-					(info.swap.total / 1024) + " <%:kB%>"
+					Math.floor(info.swap.free / 1048576) + " <%:MB%>",
+					Math.floor(info.swap.total / 1048576) + " <%:MB%>"
 				);
 
 			if (e = document.getElementById('conns'))
@@ -683,13 +695,16 @@
 		<tr><td width="33%"><%:Hostname%></td><td><%=luci.sys.hostname() or "?"%></td></tr>
 		<tr><td width="33%"><%:Model%></td><td><%=pcdata(boardinfo.model or boardinfo.system or "?")%></td></tr>
 		<tr><td width="33%"><%:Firmware Version%></td><td>
-			<%=pcdata(ver.distname)%> <%=pcdata(ver.distversion)%> /
-			<%=pcdata(ver.luciname)%> (<%=pcdata(ver.luciversion)%>)
+			<%=pcdata(ver.distname)%> <%=pcdata(ver.distversion)%>
 		</td></tr>
 		<tr><td width="33%"><%:Kernel Version%></td><td><%=unameinfo.release or "?"%></td></tr>
+		<tr><td width="33%"><%:CPU Temperature%></td><td id="temperature">-</td></tr>
 		<tr><td width="33%"><%:Local Time%></td><td id="localtime">-</td></tr>
 		<tr><td width="33%"><%:Uptime%></td><td id="uptime">-</td></tr>
 		<tr><td width="33%"><%:Load Average%></td><td id="loadavg">-</td></tr>
+		<tr><td width="33%"><%:CPU usage (%)%></td><td id="cpuusage">-</td></tr>
+		
+		
 	</table>
 </fieldset>
 

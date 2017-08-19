@@ -21,6 +21,7 @@ function index()
 
 	-- Empty services menu to be populated by addons
 	entry({"admin", "services"}, firstchild(), _("Services"), 40).index = true
+	entry({"admin","usbapps"},firstchild(),_("usbapps"),41).index=true
 
 	entry({"admin", "logout"}, call("action_logout"), _("Logout"), 90)
 end

@@ -1,0 +1,84 @@
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8"
+
+msgid "Other"
+msgstr ""
+
+msgid "Upload / Download"
+msgstr ""
+
+msgid "Web Camera"
+msgstr ""
+
+msgid "Service 'mjpg_streamer' not started."
+msgstr ""
+
+msgid "Video device not found."
+msgstr ""
+
+
+msgid "Upload"
+msgstr ""
+
+msgid "Upload file to '/tmp/upload/'"
+msgstr ""
+
+msgid "Download"
+msgstr ""
+
+msgid "Download file"
+msgstr ""
+
+msgid "Couldn't open file: "
+msgstr ""
+
+msgid "Create upload file error."
+msgstr ""
+
+msgid "File saved to"
+msgstr ""
+
+msgid "No specify upload file."
+msgstr ""
+
+msgid "Upload file list"
+msgstr ""
+
+msgid "File name"
+msgstr ""
+
+msgid "Modify time"
+msgstr ""
+
+msgid "Mode string"
+msgstr ""
+
+msgid "Size"
+msgstr ""
+
+msgid "Remove"
+msgstr ""
+
+msgid "Install"
+msgstr ""
+
+
+msgid "Start"
+msgstr ""
+
+msgid "Stop"
+msgstr ""
+
+
+msgid "Upload file:"
+msgstr ""
+
+msgid "Upload"
+msgstr ""
+
+
+msgid "Download file:"
+msgstr ""
+
+msgid "Download"
+msgstr ""

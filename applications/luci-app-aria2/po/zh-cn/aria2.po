@@ -13,6 +13,9 @@ msgstr "打开YAAW"
 msgid "Open WebUI-Aria2"
 msgstr "打开WebUI-Aria2"
 
+msgid "Open Aria-Ng"
+msgstr "打开Aria-Ng"
+
 msgid "The Aria2 service is running."
 msgstr "Aria2 正在运行"
 

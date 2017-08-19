@@ -1,0 +1,17 @@
+<%+header%>
+<div class="cbi-section-error"<% if not msg then %> style="display:none"<% end %>><%=msg%></div>
+<form method="post" action="<%=REQUEST_URI%>"<%if status == nil then %> style="display:none"<% end %>>
+	<div class="cbi-section-node">
+		<div class="cbi-value cbi-value-last">
+			<input type="hidden" name="act" value="<% if status then write('stop') else write('start') end %>" />
+			<div class="cbi-value-field">
+				<input class="cbi-button cbi-input-<% if status then write('remove') else write('apply') end %>" type="submit" value="<% if status then write(translate('Stop')) else write(translate('Start')) end %>" />
+			</div>
+		</div>
+	</div>
+</form>
+<div style="text-align: center">
+	<% if html then write(html) end %>
+</div>
+<%+footer%>
+
