@@ -14,7 +14,7 @@ if e.server and e.remarks then
 n[e[".name"]]="%s:%s"%{e.remarks,e.server}
 end
 end)
-a=Map(i,translate("ShadowSocks"),translate("A lightweight secured SOCKS5 proxy"))
+a=Map(i,translate("<br />推荐SSR服务:</font><a style=\"color: #ff0000;\" onclick=\"window.open('https://caoo.me/aff.php?aff=85')\">点击跳转链接到动车组SS</a>（八折优惠码：Gargoyle）"),translate("欢迎加入 CRH 加速服务，多优化服务器，高可靠性，更灵活的专属定制，快速响应一对一指导。"))
 a.template="shadowsocks/index"
 t=a:section(TypedSection,"global",translate("Running Status"))
 t.anonymous=true
