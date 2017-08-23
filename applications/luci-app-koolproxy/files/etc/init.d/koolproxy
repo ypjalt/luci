@@ -254,7 +254,7 @@ start() {
 	[ -f "$LOCK_FILE" ] && return 3
 	touch "$LOCK_FILE"
 	
-	[ "$GLOBAL_MODE" == "vedio" ] && arg="-e" || arg=""
+	[ "$GLOBAL_MODE" == "video" ] && arg="-e" || arg=""
 
 	/usr/share/koolproxy/koolproxy $arg --mark -d
 	add_rule

@@ -17,6 +17,21 @@ msgstr ""
 
 #: usr/lib/lua/luci/controller/sqm.lua:24
 
+msgid "SSR Server Subscribe"
+msgstr "服务器订阅"
+
+msgid "Subscribe URL"
+msgstr "订阅网址"
+
+msgid "Servers unsubscribed will be deleted in next update; Please summit the Subscribe URL first before manually update."
+msgstr "取消订阅的服务器将在下次更新时删除，请先输入订阅网址保存提交之后再更新。"
+
+msgid "Delete All Subscribe"
+msgstr "删除所有订阅"
+
+msgid "Enable auto update subscribe"
+msgstr "开启自动更新订阅"
+
 msgid "usbapps"
 msgstr "USB"
 
