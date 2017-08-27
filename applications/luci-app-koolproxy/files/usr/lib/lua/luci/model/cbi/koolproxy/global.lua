@@ -37,7 +37,6 @@ e.rmempty=false
 e=t:taboption("base",ListValue,"filter_mode",translate('Default')..translate("Filter Mode"))
 e.default="adblock"
 e.rmempty=false
-e:value("disable",translate("No Filter"))
 e:value("global",translate("Global Filter"))
 e:value("adblock",translate("AdBlock Filter"))
 e:value("video",translate("Video Filter"))

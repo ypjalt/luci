@@ -158,9 +158,11 @@ get_jump_mode(){
 add_koolproxy_cru(){
 time=$(config_t_get global time_update)
 wirtecron=$(cat /etc/crontabs/root | grep "00 $time * * *" | grep koolproxy)
-if [ -z "$wirtecron" ];then
+if [ -z "$wirtecron" ] && [ "$GLOBAL_MODE" == "adblock" ];then 
   sed -i '/koolproxy/d' /etc/crontabs/root >/dev/null 2>&1
   echo "0 $time * * * /etc/init.d/koolproxy update" >> /etc/crontabs/root 
+else
+    sed -i '/koolproxy update/d' /etc/crontabs/root >/dev/null 2>&1
 fi
 }
 
