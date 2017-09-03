@@ -19,7 +19,7 @@ define Package/$(PKG_NAME)
         DEPENDS:=+shadowsocksr +shadowsocks +dnsmasq-full +ipset +ip-full +iptables-mod-tproxy +kmod-ipt-compat-xtables \
 			+kmod-ipt-tproxy +iptables-mod-nat-extra +iptables-mod-geoip \
 				+libustream-openssl +ca-bundle +ca-certificates +curl +whereis +resolveip \
-					 +cdns +dns2socks +pcap-dnsproxy +pdnsd +haproxy
+					 +dns2socks +pcap-dnsproxy +pdnsd +haproxy
 
 endef
 
