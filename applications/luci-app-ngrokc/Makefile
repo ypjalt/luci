@@ -15,18 +15,14 @@ PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)
 include $(INCLUDE_DIR)/package.mk
 
 define Package/luci-app-ngrokc
-	SECTION:=luci
+	TITLE:=LuCI support for ngrokc.
+	ECTION:=luci
 	CATEGORY:=LuCI
 	SUBMENU:=3. Applications
-	TITLE:=LuCI support for ngrokc.
 	PKGARCH:=all
 	DEPENDS:=+ngrokc
 endef
 
-
-define Package/luci-app-cdns/description
-	LuCI Support for cdns.
-endef
 
 define Package/$(PKG_NAME)/postinst
 #!/bin/sh
