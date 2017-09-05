@@ -4,13 +4,14 @@
 . /lib/functions.sh
 
 #检测IP列表
-chk_ip_list="$(cat /tmp/resolv.conf.auto | grep nameserver | cut -d' ' -f2 | sort -u | tr '\n' ' ') 223.5.5.5 223.6.6.6 119.29.29.29 114.114.114.114 114.114.115.115"
+chk_ip_list="$(cat /tmp/resolv.conf.auto | grep nameserver | cut -d' ' -f2 | sort -u | tr '\n' ' ') 114.114.114.114 114.114.115.115 223.5.5.5 223.6.6.6 119.29.29.29 1.2.4.8"
 origfirewall=$(uci get firewall.@zone[1].network)
 backupdev=$(uci get syncdial.config.devbackup)
 norun=$(echo $origfirewall|grep vwan)
 nomwan=$(uci get syncdial.config.nomwan)
 wanselect=$(uci get syncdial.config.wanselect)
 wannum=$(uci get syncdial.config.wannum)
+oldframe=$(uci get syncdial.config.old_frame)
 
 dial_type=$(uci get syncdial.config.dial_type)
 [ $dial_type -eq 2 ] && {
@@ -36,7 +37,7 @@ mwan_cfg_add() {
 	uci set mwan3.${1}.count=1
 	uci set mwan3.${1}.timeout=2
 	uci set mwan3.${1}.interval=5
-	uci set mwan3.${1}.down=3
+	uci set mwan3.${1}.down=5
 	uci set mwan3.${1}.up=1
 	for i in $chk_ip_list
 	do
@@ -111,11 +112,18 @@ general_config_load() {
 	config_get_bool enabled 'config' 'enabled'
 	config_get_bool old_frame 'config' 'old_frame'
 	congig_get_bool dial_type 'config' 'dial_type'
-	[ $enabled -eq 0 ] && {
+
+	if [ $enabled -eq 0 ]; then
+		if [ $old_frame -eq 1 ]; then
+			mwan_cfg_add $wanselect
+			if [ $dial_type -eq 2 ]; then
+				mwan_cfg_add $wanselect2
+			fi
+		fi
 		echo "Disabled.Exit now."
 		apply_cfg
 		exit 1
-	}
+	fi
   
 	config_load 'network'
 	config_get pppoe_user $wanselect 'username'
@@ -155,7 +163,14 @@ general_config_remove() {
 	[ $(uci get network.$wanselect.proto) == "none" ] && {
 		uci set network.$wanselect.proto=pppoe
 	}
-	[ $nomwan -ne 1 ] && mwan_cfg_del $wanselect
+
+	if [ $oldframe -eq 0 ]; then
+		[ "$wanselect" != "$(echo $(uci get syncdial.config.devbackup)| cut -d " " -f1)" ] && \
+		[ "$wanselect" != "$(echo $(uci get syncdial.config.devbackup)| cut -d " " -f2)" ] && \
+			[ $nomwan -ne 1 ] && mwan_cfg_del $wanselect
+	else
+		[ $nomwan -ne 1 ] && mwan_cfg_del $wanselect
+	fi
 
 	[ $dial_type -eq 2 ] && {
 		for i in $(seq 1 $wannum2)
@@ -165,7 +180,14 @@ general_config_remove() {
 		[ $(uci get network.$wanselect2.proto) == "none" ] && {
 			uci set network.$wanselect2.proto=pppoe
 		}
-		[ $nomwan -ne 1 ] && mwan_cfg_del $wanselect2
+		
+		if [ $oldframe -eq 0 ]; then
+			[ "$wanselect2" != "$(echo $(uci get syncdial.config.devbackup)| cut -d " " -f1)" ] && \
+			[ "$wanselect2" != "$(echo $(uci get syncdial.config.devbackup)| cut -d " " -f2)" ] && \
+				[ $nomwan -ne 1 ] && mwan_cfg_del $wanselect2
+		else
+			[ $nomwan -ne 1 ] && mwan_cfg_del $wanselect2
+		fi
 	}
 }
 
@@ -186,14 +208,18 @@ uci set network.$wanselect.metric=40
 		ifconfig macvlan$i up
 	done
 }
-[ $old_frame -eq 0 -a $nomwan -ne 1 ] && mwan_cfg_add $wanselect
+[ "$wanselect" != "$(echo $(uci get syncdial.config.devbackup)| cut -d " " -f1)" ] && \
+	[ "$wanselect" != "$(echo $(uci get syncdial.config.devbackup)| cut -d " " -f2)" ] && \
+		[ $old_frame -eq 0 -a $nomwan -ne 1 ] && mwan_cfg_add $wanselect
 
-for i in $(seq 1 $wannum)
-do
-	[ $old_frame -eq 0 ] && macvlan_dev_add macvlan$i $pppoe_ifname
-	pppoe_if_add vwan$i macvlan$i $pppoe_user $pppoe_password $((40+$i))
-	[ $nomwan -ne 1 ] && mwan_cfg_add vwan$i
-done
+[ $wannum -gt 0 ] && {
+	for i in $(seq 1 $wannum)
+	do
+		[ $old_frame -eq 0 ] && macvlan_dev_add macvlan$i $pppoe_ifname
+		pppoe_if_add vwan$i macvlan$i $pppoe_user $pppoe_password $((40+$i))
+		[ $nomwan -ne 1 ] && mwan_cfg_add vwan$i
+	done
+}
 
 ###dualdial configuration
 [ "$(uci get syncdial.config.dial_type)" = "2" ] && {
@@ -210,14 +236,18 @@ done
 			ifconfig macvlan$(($wannum+$i)) up
 		done
 	}
-	[ $old_frame -eq 0 -a $nomwan -ne 1 ] && mwan_cfg_add $wanselect2
+	[ "$wanselect2" != "$(echo $(uci get syncdial.config.devbackup)| cut -d " " -f1)" ] && \
+		[ "$wanselect2" != "$(echo $(uci get syncdial.config.devbackup)| cut -d " " -f2)" ] && \
+			[ $old_frame -eq 0 -a $nomwan -ne 1 ] && mwan_cfg_add $wanselect2
 	
-	for i in $(seq 1 $wannum2)
-	do
-		[ $old_frame -eq 0 ] && macvlan_dev_add macvlan$(($wannum+$i)) $pppoe_ifname2
-		pppoe_if_add vwan$(($wannum+$i)) macvlan$(($wannum+$i)) $pppoe_user2 $pppoe_password2 $((60+$i))
-		[ $nomwan -ne 1 ] && mwan_cfg_add vwan$(($wannum+$i))
-	done
+	[ $wannum2 -gt 0 ] && {
+		for i in $(seq 1 $wannum2)
+		do
+			[ $old_frame -eq 0 ] && macvlan_dev_add macvlan$(($wannum+$i)) $pppoe_ifname2
+			pppoe_if_add vwan$(($wannum+$i)) macvlan$(($wannum+$i)) $pppoe_user2 $pppoe_password2 $((60+$i))
+			[ $nomwan -ne 1 ] && mwan_cfg_add vwan$(($wannum+$i))
+		done
+	}
 }
 
 
