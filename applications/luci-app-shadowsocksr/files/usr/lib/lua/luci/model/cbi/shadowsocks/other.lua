@@ -51,7 +51,7 @@ o=s:option(Flag,"dns_53",translate("DNS Hijack"))
 o.default=0
 o.rmempty=false
 local e=luci.sys.exec("ip route|grep default|wc -l")
-o=s:option(ListValue,"wan_port",translate("Export Of Multi WAN"))
+o=s:option(ListValue,"wan_port",translate("Designated Export for SS"))
 for e=0,e do
 if e==0 then o:value(e,translate("Not Specify"))
 else

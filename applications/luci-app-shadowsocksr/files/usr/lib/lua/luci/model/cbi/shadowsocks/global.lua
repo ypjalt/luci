@@ -14,7 +14,7 @@ if e.server and e.remarks then
 n[e[".name"]]="%s:%s"%{e.remarks,e.server}
 end
 end)
-a=Map(i,translate("<br />推荐SSR服务:</font><a style=\"color: #ff0000;\" onclick=\"window.open('https://caoo.me/aff.php?aff=85')\">点击跳转链接到动车组SS</a>（八折优惠码：Gargoyle）"),translate("欢迎加入 CRH 加速服务，多优化服务器，高可靠性，更灵活的专属定制，快速响应一对一指导。"))
+a=Map(i,translate("ShadowSocks"),translate("A lightweight secured SOCKS5 proxy"))
 a.template="shadowsocks/index"
 t=a:section(TypedSection,"global",translate("Running Status"))
 t.anonymous=true
@@ -58,36 +58,60 @@ if is_installed("dns2socks")then
 e:value("dns2socks","dns2socks")
 end
 if is_installed("pcap-dnsproxy")then
-e:value("pcap-dnsproxy","pcap-dnsproxy")
+e:value("Pcap_DNSProxy","Pcap_DNSProxy")
 end
 if is_installed("pdnsd")then
 e:value("pdnsd","pdnsd")
+end
+if is_installed("dnsc")then
+e:value("dnsc","dnsc")
+end
+if is_installed("dnsproxy")then
+e:value("dnsproxy","dnsproxy")
 end
 if is_installed("cdns")then
 e:value("cdns","cdns")
 end
 if is_installed("ChinaDNS")then
-e:value("chinadns","chinadns")
+e:value("chinadns",translate("ChinaDNS"))
+end
+e:value("ssr-tunnel","ssr-tunnel")
+e=t:option(ListValue,"up_dns_mode",translate("upstreamm DNS Server for ChinaDNS"))
+e.default="dnsproxy"
+e:depends("dns_mode","chinadns")
+if is_installed("dnsproxy")then
+e:value("dnsproxy","dnsproxy")
+end
+if is_installed("dns-forwarder")then
+e:value("dns-forwarder","dns-forwarder")
 end
 e:value("ssr-tunnel","ssr-tunnel")
 t=a:section(TypedSection,"servers",translate("Servers List"))
 t.anonymous=true
 t.addremove=true
 t.template="cbi/tblsection"
-t.extedit=o.build_url("admin","services","shadowsocks","serverconfig","%s")
+t.extedit=o.build_url("admin","vpn","shadowsocks","serverconfig","%s")
 function t.create(e,t)
 local e=TypedSection.create(e,t)
-luci.http.redirect(o.build_url("admin","services","shadowsocks","serverconfig",e))
+luci.http.redirect(o.build_url("admin","vpn","shadowsocks","serverconfig",e))
 end
 function t.remove(t,a)
 t.map.proceed=true
 t.map:del(a)
-luci.http.redirect(o.build_url("admin","services","shadowsocks"))
+luci.http.redirect(o.build_url("admin","vpn","shadowsocks"))
 end
 e=t:option(DummyValue,"remarks",translate("Node Remarks"))
-e.width="30%"
+e.width="20%"
 e=t:option(DummyValue,"server_type",translate("Server Type"))
-e.width="15%"
+e.width="10%"
+e.cfgvalue=function(t,n)
+local t=a.uci:get(i,n,"server_type")or""
+local b
+if t==""or b==""then return""end
+if t=="ssr" then b="ShadowSocksR"
+else b="ShadowSocks" end
+return b
+end
 e=t:option(DummyValue,"server",translate("Server Address"))
 e.width="20%"
 e=t:option(DummyValue,"server_port",translate("Server Port"))

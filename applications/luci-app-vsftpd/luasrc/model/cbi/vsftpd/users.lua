@@ -24,7 +24,7 @@ o.default = "ftp"
 
 s = m:section(TypedSection, "user", translate("User lists"))
 s.template = "cbi/tblsection"
-s.extedit  = luci.dispatcher.build_url("admin/usbapps/vsftpd/item/%s")
+s.extedit  = luci.dispatcher.build_url("admin/nas/vsftpd/item/%s")
 s.addremove = true
 s.anonymous = true
 

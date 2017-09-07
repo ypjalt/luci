@@ -5,35 +5,35 @@
 
 <% include("cbi/map") %>
 <script type="text/javascript">//<![CDATA[
-	XHR.poll(3, '<%=luci.dispatcher.build_url("admin", "services", "shadowsocks", "status")%>', null,
+	XHR.poll(3, '<%=luci.dispatcher.build_url("admin", "vpn", "shadowsocks", "status")%>', null,
 		function(x, result)
 		{
 			var status = document.getElementsByClassName('shadowsocks_status');
 			status[0].innerHTML = result.ss_redir?'<font color=green><%=translate("RUNNING")%></font>':'<font color=red><%=translate("NOT RUNNING")%></font>';
 		}
 	);
-	XHR.poll(3, '<%=luci.dispatcher.build_url("admin", "services", "shadowsocks", "hrstatus")%>', null,
+	XHR.poll(3, '<%=luci.dispatcher.build_url("admin", "vpn", "shadowsocks", "hrstatus")%>', null,
 		function(x, result)
 		{
 			var haproxys = document.getElementsByClassName('hrstatus');
 			haproxys[0].innerHTML = result.hrstatus?'<font color=green><%=translate("RUNNING")%></font>':'<font color=red><%=translate("NOT RUNNING")%></font>';
 		}
 	);
-	XHR.poll(3, '<%=luci.dispatcher.build_url("admin", "services", "shadowsocks", "kcpstatus")%>', null,
+	XHR.poll(3, '<%=luci.dispatcher.build_url("admin", "vpn", "shadowsocks", "kcpstatus")%>', null,
 		function(x, result)
 		{
 			var kcps = document.getElementsByClassName('kcpstatus');
 			kcps[0].innerHTML = result.kcpstatus?'<font color=green><%=translate("RUNNING")%></font>':'<font color=red><%=translate("NOT RUNNING")%></font>';
 		}
 	);
-	XHR.poll(3, '<%=luci.dispatcher.build_url("admin", "services", "shadowsocks", "china")%>', null,
+	XHR.poll(3, '<%=luci.dispatcher.build_url("admin", "vpn", "shadowsocks", "china")%>', null,
 		function(x, result)
 		{
 			var chinas = document.getElementsByClassName('china_status');
 			chinas[0].innerHTML = result.china?'<font color=green><%=translate("working...")%></font>':'<font color=red><%=translate("Problem detected!")%></font>';
 		}
 	);
-	XHR.poll(3, '<%=luci.dispatcher.build_url("admin", "services", "shadowsocks", "foreign")%>', null,
+	XHR.poll(3, '<%=luci.dispatcher.build_url("admin", "vpn", "shadowsocks", "foreign")%>', null,
 		function(x, result)
 		{
 			var foreigns = document.getElementsByClassName('foreign_status');
@@ -43,7 +43,7 @@
 	var pings = document.getElementsByClassName('pingtime');
 	for(var i = 0; i<pings.length; i++)
 	{
-		XHR.poll(3, '<%=luci.dispatcher.build_url("admin", "services", "shadowsocks", "ping")%>', {index: i, domain: pings[i].getAttribute("hint")},
+		XHR.poll(3, '<%=luci.dispatcher.build_url("admin", "vpn", "shadowsocks", "ping")%>', {index: i, domain: pings[i].getAttribute("hint")},
 			function(x, result)
 			{
 				pings[result.index].innerHTML = (result.ping?result.ping:"--") + " ms";

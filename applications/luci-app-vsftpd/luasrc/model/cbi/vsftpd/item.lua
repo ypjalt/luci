@@ -17,7 +17,7 @@ local utl = require "luci.util"
 
 m = Map("vsftpd", translate("FTP Server - Virtual User &lt;new&gt;"))
 
-m.redirect = luci.dispatcher.build_url("admin/usbapps/vsftpd/users")
+m.redirect = luci.dispatcher.build_url("admin/nas/vsftpd/users")
 
 if m.uci:get("vsftpd", sid) ~= "user" then
 	luci.http.redirect(m.redirect)

@@ -1,4 +1,0 @@
-#!/bin/sh
-# pptpd integration for firewall3
-
-/etc/init.d/pptpd reload

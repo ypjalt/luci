@@ -15,56 +15,6 @@ msgstr ""
 "X-Poedit-KeywordsList: translate\n"
 "X-Poedit-SearchPath-0: .\n"
 
-#: usr/lib/lua/luci/controller/sqm.lua:24
-
-msgid "SSR Server Subscribe"
-msgstr "服务器订阅"
-
-msgid "Subscribe URL"
-msgstr "订阅网址"
-
-msgid "Servers unsubscribed will be deleted in next update; Please summit the Subscribe URL first before manually update."
-msgstr "取消订阅的服务器将在下次更新时删除，请先输入订阅网址保存提交之后再更新。"
-
-msgid "Delete All Subscribe"
-msgstr "删除所有订阅"
-
-msgid "Enable auto update subscribe"
-msgstr "开启自动更新订阅"
-
-msgid "usbapps"
-msgstr "USB"
-
-msgid "DNS Forward Mode"
-msgstr "DNS转发模式"
-
-msgid "Video Filter"
-msgstr "视频模式"
-
-msgid "Set Blacklist Of Websites"
-msgstr "网站黑名单"
-
-msgid "Set Blacklist Of IP"
-msgstr "IP黑名单"
-
-msgid "Set Blacklist Of custom"
-msgstr "自定义规则"
-
-msgid "Core"
-msgstr "核心"
-
-msgid "Thread"
-msgstr "线程"
-
-msgid "CPU Temperature"
-msgstr "CPU温度"
-
-msgid "CPU frequency"
-msgstr "当前频率"
-
-msgid "Baseboard Product"
-msgstr "主板信息"
-
 msgid "SQM QoS"
 msgstr "SQM QoS"
 

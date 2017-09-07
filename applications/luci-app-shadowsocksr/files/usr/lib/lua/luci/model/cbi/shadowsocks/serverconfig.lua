@@ -30,6 +30,7 @@ local o={
 "chacha20-ietf",
 "chacha20-ietf-poly1305",
 "chacha20-poly1305",
+"xchacha20-ietf-poly1305",
 }
 local h={
 "origin",
@@ -69,7 +70,7 @@ for e=1,5,1 do table.remove(o,11)end
 end
 arg[1]=arg[1]or""
 a=Map(i,translate("ShadowSocks Server Config"),translate("Leave the default false if the server does not support TCP_fastopen and Onetime Authentication."))
-a.redirect=d.build_url("admin","services","shadowsocks")
+a.redirect=d.build_url("admin","vpn","shadowsocks")
 t=a:section(NamedSection,arg[1],"servers","")
 t.addremove=false
 t.dynamic=false

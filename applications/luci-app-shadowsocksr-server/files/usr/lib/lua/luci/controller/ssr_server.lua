@@ -3,8 +3,8 @@ function index()
 if not nixio.fs.access("/etc/config/ssr_server")then
 return
 end
-entry({"admin","services","ssr_server"},cbi("ssr_server"),_("shadowsocks-server"),4).dependent=true
-entry({"admin","services","ssr_server","status"},call("act_status")).leaf=true
+entry({"admin","vpn","ssr_server"},cbi("ssr_server"),_("shadowsocks-server"),4).dependent=true
+entry({"admin","vpn","ssr_server","status"},call("act_status")).leaf=true
 end
 function act_status()
 local e={}

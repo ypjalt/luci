@@ -12,6 +12,9 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.0.6\n"
 
+msgid "NAS"
+msgstr "网络存储"
+
 msgid ". and .. are excluded."
 msgstr ". 和 .. 将被忽略。"
 
